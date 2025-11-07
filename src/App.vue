@@ -1,30 +1,53 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+    <div class="personal-portal-website-container">
+        <Header v-show="showHeader" />
+
+        <div class="personal-portal-body-container">
+            <router-view />
+        </div>
+
+        <Footer v-if="showFooter" />
+    </div>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+<script setup>
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import Header from "./components/Header.vue";
+import Footer from "./components/Footer.vue";
+
+// 获取当前路由信息（route 对象本身是响应式的）
+// 可以直接在模板中使用 route.path、route.name 等，会自动更新
+const route = useRoute();
+
+const showHeader = computed(() => {
+    return !route.meta.hideHeader;
+});
+
+const showFooter = computed(() => {
+    return !!route.meta.displayFooter;
+});
+
+
+</script>
+
+<style lang="less" scoped>
+.personal-portal-website-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: #f0f0f0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+
+  .personal-portal-body-container {
+    flex: 1;
+    overflow: auto;
+    box-sizing: border-box;
+    background-color: #fff;
+  }
 }
 </style>
