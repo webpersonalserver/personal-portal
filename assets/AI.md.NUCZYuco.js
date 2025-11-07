@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as a}from"./chunks/framework.BA2Zb-IB.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"AI.md","filePath":"AI.md"}'),r={name:"AI.md"};function o(s,c,n,p,_,d){return a(),t("div")}const f=e(r,[["render",o]]);export{m as __pageData,f as default};
