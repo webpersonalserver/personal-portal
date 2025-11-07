@@ -1,10 +1,10 @@
 // src/router/index.ts
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import config from "./config";
 import { onBeforeEach, onAfterEach } from "./tools";
 
 const router = createRouter({
-    history: createWebHistory("/personal-portal/"), // 注意 base 设置为仓库名
+    history: createWebHashHistory(), // Hash 模式
     routes: config
 });
 

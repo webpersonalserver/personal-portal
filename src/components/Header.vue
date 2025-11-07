@@ -27,6 +27,11 @@ const menus = computed(() => [
         path: "/"
     },
     {
+        key: "Heart",
+        label: "Heart",
+        path: "/heart"
+    },
+    {
         key: "Experiment",
         label: "Experiment",
         path: "/experiment"

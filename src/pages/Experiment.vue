@@ -14,82 +14,37 @@
                 ❤️
             </span>
         </div>
-        <div class="heart-container">
-            <canvas ref="canvasRef" class="heart-canvas"></canvas>
-        </div>
+
+        <div ref="containerRef" class="heart-container"></div>
+
         <div class="romantic-text">Love You Forever 💕</div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import * as THREE from "three";
 
-const canvasRef = ref(null);
+const containerRef = ref(null);
+let scene = null;
+let camera = null;
+let renderer = null;
+let particles = null;
 let animationId = null;
-let particles = [];
-const particleCount = 1000; // 增加粒子数量，形成更完整的爱心形状
 
-// 多彩颜色数组
+// 红色和粉色颜色数组
 const colors = [
-    "#ff1744", "#ff6b9d", "#ff4081", "#e91e63", "#c2185b", // 红色系
-    "#ff9800", "#ff5722", "#ff6f00", "#ff3d00", // 橙色系
-    "#ffeb3b", "#ffc107", "#ffca28", // 黄色系
-    "#4caf50", "#8bc34a", "#66bb6a", // 绿色系
-    "#2196f3", "#03a9f4", "#00bcd4", "#0097a7", // 蓝色系
-    "#9c27b0", "#e91e63", "#ba68c8", "#ab47bc", // 紫色系
-    "#fff", "#ffe0e6", "#ffebee", "#fff5f5" // 白色系
+    0xff1744, // 红色
+    0xff6b9d, // 粉色
+    0xff4081, // 粉红色
+    0xe91e63, // 粉红色
+    0xc2185b, // 深粉色
+    0xff1493, // 深粉色
+    0xff69b4, // 热粉色
+    0xffc0cb // 浅粉色
 ];
 
-// 粒子类
-class Particle {
-    constructor(x, y, size, color) {
-        this.x = x;
-        this.y = y;
-        this.baseX = x;
-        this.baseY = y;
-        this.size = size;
-        this.color = color;
-        this.opacity = 0.7 + Math.random() * 0.3;
-        this.life = Math.random() * Math.PI * 2;
-        this.speed = 0.02 + Math.random() * 0.03;
-        this.radius = 1 + Math.random() * 2; // 粒子围绕基础位置的半径
-    }
-
-    update() {
-        // 粒子围绕基础位置做轻微的圆周运动
-        this.life += this.speed;
-        this.x = this.baseX + Math.cos(this.life) * this.radius;
-        this.y = this.baseY + Math.sin(this.life) * this.radius;
-    }
-
-    draw(ctx) {
-        ctx.save();
-        ctx.globalAlpha = this.opacity;
-
-        // 绘制粒子主体
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 添加光晕效果
-        const gradient = ctx.createRadialGradient(
-            this.x, this.y, 0,
-            this.x, this.y, this.size * 3
-        );
-        gradient.addColorStop(0, this.color);
-        gradient.addColorStop(0.5, this.color + "80");
-        gradient.addColorStop(1, "transparent");
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-    }
-}
-
-// 绘制爱心形状
+// 绘制爱心形状（使用贝塞尔曲线，与之前 Canvas 2D 版本一致）
 const drawHeart = (ctx, x, y, size) => {
     ctx.beginPath();
     const topCurveHeight = size * 0.3;
@@ -105,133 +60,258 @@ const drawHeart = (ctx, x, y, size) => {
     ctx.closePath();
 };
 
-// 检查点是否在爱心内部
-const isPointInHeart = (x, y, centerX, centerY, size) => {
+// 检查点是否在爱心内部（使用 Canvas 2D 路径检测，与之前版本一致）
+const isPointInHeart = (x, y, centerX = 0, centerY = 0, size = 350) => {
+    // 创建临时 canvas 来检测点
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     canvas.width = size * 2;
     canvas.height = size * 2;
-    drawHeart(ctx, centerX, centerY, size);
-    return ctx.isPointInPath(x, y);
+
+    // 在 canvas 中心绘制爱心
+    drawHeart(ctx, size, size, size);
+
+    // 将点坐标转换到 canvas 坐标系
+    const canvasX = size + (x - centerX);
+    const canvasY = size + (y - centerY);
+
+    return ctx.isPointInPath(canvasX, canvasY);
 };
 
-// 初始化粒子系统（多彩粒子填充爱心）
-const initParticles = (centerX, centerY, heartSize) => {
-    particles = [];
+// 生成爱心形状的点（填充整个爱心内部，使用与之前 Canvas 2D 一致的形状）
+const generateHeartPoints = (count = 15000) => {
+    const positions = new Float32Array(count * 3);
+    const colorsArray = new Float32Array(count * 3);
 
-    // 使用网格化方式在爱心内部均匀分布粒子
-    const gridSize = 8;
-    const startX = centerX - heartSize / 2;
-    const startY = centerY - heartSize / 2;
+    // 爱心尺寸（与之前 Canvas 版本一致）
+    const heartSize = 350;
+    const centerX = 0;
+    const centerY = 0;
 
+    // 爱心的边界范围（基于贝塞尔曲线爱心）
+    const maxX = heartSize / 2;
+    const maxY = heartSize;
+
+    let generated = 0;
+    let attempts = 0;
+    const maxAttempts = count * 15; // 增加尝试次数
+
+    // 使用网格化 + 随机填充的方式（减小网格，增加密度）
+    const gridSize = 5; // 减小网格大小，增加粒子密度
+    const gridPoints = [];
+
+    // 先创建网格点
+    const startX = centerX - maxX;
+    const startY = centerY - maxY / 2;
     for (let y = startY; y < startY + heartSize; y += gridSize) {
         for (let x = startX; x < startX + heartSize; x += gridSize) {
-            // 检查点是否在爱心内部
             if (isPointInHeart(x, y, centerX, centerY, heartSize)) {
-                const size = 2 + Math.random() * 2.5;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                particles.push(new Particle(x, y, size, color));
+                gridPoints.push({ x, y });
             }
         }
     }
 
-    // 补充一些随机粒子，让填充更完整
-    let attempts = 0;
-    while (particles.length < particleCount && attempts < 5000) {
+    // 填充网格点（增加网格点使用比例）
+    for (let i = 0; i < Math.min(gridPoints.length, count * 0.8); i++) {
+        const point = gridPoints[i];
+        const offsetX = (Math.random() - 0.5) * gridSize * 0.6;
+        const offsetY = (Math.random() - 0.5) * gridSize * 0.6;
+        const offsetZ = (Math.random() - 0.5) * 2;
+
+        // 翻转 Y 坐标（Three.js Y 轴向上，Canvas Y 轴向下）
+        positions[generated * 3] = point.x + offsetX;
+        positions[generated * 3 + 1] = -(point.y + offsetY); // 翻转 Y 轴
+        positions[generated * 3 + 2] = offsetZ;
+
+        // 随机红色或粉色
+        const color = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
+        colorsArray[generated * 3] = color.r;
+        colorsArray[generated * 3 + 1] = color.g;
+        colorsArray[generated * 3 + 2] = color.b;
+
+        generated++;
+    }
+
+    // 随机填充剩余的点（增加密度）
+    while (generated < count && attempts < maxAttempts) {
         attempts++;
-        const angle = Math.random() * Math.PI * 2;
-        const radius = Math.random() * (heartSize / 2 - 5);
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
+        const x = startX + Math.random() * heartSize;
+        const y = startY + Math.random() * heartSize;
 
         if (isPointInHeart(x, y, centerX, centerY, heartSize)) {
-            // 检查是否与已有粒子太近
-            let tooClose = false;
-            for (let i = 0; i < particles.length && !tooClose; i++) {
-                const p = particles[i];
-                const dist = Math.sqrt(Math.pow(p.baseX - x, 2) + Math.pow(p.baseY - y, 2));
-                if (dist < gridSize * 0.8) {
-                    tooClose = true;
-                }
-            }
+            const offsetZ = (Math.random() - 0.5) * 2;
 
-            if (!tooClose) {
-                const size = 2 + Math.random() * 2.5;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                particles.push(new Particle(x, y, size, color));
-            }
+            // 翻转 Y 坐标
+            positions[generated * 3] = x;
+            positions[generated * 3 + 1] = -y; // 翻转 Y 轴
+            positions[generated * 3 + 2] = offsetZ;
+
+            // 随机红色或粉色
+            const color = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
+            colorsArray[generated * 3] = color.r;
+            colorsArray[generated * 3 + 1] = color.g;
+            colorsArray[generated * 3 + 2] = color.b;
+
+            generated++;
         }
     }
+
+    // 如果还没填满，继续随机填充
+    while (generated < count && attempts < maxAttempts * 2) {
+        attempts++;
+        const x = startX + Math.random() * heartSize;
+        const y = startY + Math.random() * heartSize;
+
+        if (isPointInHeart(x, y, centerX, centerY, heartSize)) {
+            const offsetZ = (Math.random() - 0.5) * 2;
+
+            // 翻转 Y 坐标
+            positions[generated * 3] = x;
+            positions[generated * 3 + 1] = -y; // 翻转 Y 轴
+            positions[generated * 3 + 2] = offsetZ;
+
+            const color = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
+            colorsArray[generated * 3] = color.r;
+            colorsArray[generated * 3 + 1] = color.g;
+            colorsArray[generated * 3 + 2] = color.b;
+
+            generated++;
+        }
+    }
+
+    return { positions, colors: colorsArray };
 };
 
-// 绘制爱心和多彩粒子
-const draw = () => {
-    const canvas = canvasRef.value;
-    if (!canvas) return;
+// 初始化 Three.js 场景
+const initThree = () => {
+    if (!containerRef.value) {
+        console.error("Container ref is null");
+        return;
+    }
 
-    const ctx = canvas.getContext("2d");
-    const size = 350;
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    // 创建场景
+    scene = new THREE.Scene();
+    scene.background = null; // 透明背景
 
-    // 清空画布
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 获取容器尺寸
+    const rect = containerRef.value.getBoundingClientRect();
+    const width = rect.width || 800;
+    const height = rect.height || 800;
 
-    // 绘制半透明爱心背景（可选，让粒子更突出）
-    const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size / 2);
-    gradient.addColorStop(0, "rgba(255, 107, 157, 0.2)");
-    gradient.addColorStop(0.5, "rgba(255, 23, 68, 0.3)");
-    gradient.addColorStop(1, "rgba(194, 24, 91, 0.4)");
+    console.log("Container size:", width, height);
 
-    drawHeart(ctx, centerX, centerY, size);
-    ctx.fillStyle = gradient;
-    ctx.fill();
+    // 创建相机（调整位置以适应 350 尺寸的爱心）
+    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 400); // 调整相机距离以适应爱心尺寸
 
-    // 添加爱心边框（可选）
-    ctx.strokeStyle = "rgba(255, 235, 238, 0.5)";
-    ctx.lineWidth = 2;
-    drawHeart(ctx, centerX, centerY, size);
-    ctx.stroke();
+    // 创建渲染器
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0); // 透明背景
+    renderer.domElement.style.display = "block";
+    containerRef.value.appendChild(renderer.domElement);
 
-    // 更新并绘制所有粒子
-    particles.forEach(particle => {
-        particle.update();
-        particle.draw(ctx);
+    // 生成粒子数据（增加数量以填充爱心）
+    const { positions, colors: colorsArray } = generateHeartPoints(15000);
+    console.log("Generated particles:", positions.length / 3);
+
+    // 创建粒子几何体
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colorsArray, 3));
+
+    // 创建粒子材质（使用 PointsMaterial 确保可见）
+    const material = new THREE.PointsMaterial({
+        size: 2.0, // 增大粒子尺寸
+        vertexColors: true,
+        transparent: true,
+        opacity: 1.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
     });
-};
 
-// 初始化画布
-const initCanvas = () => {
-    const canvas = canvasRef.value;
-    if (!canvas) return;
+    // 创建粒子系统
+    particles = new THREE.Points(geometry, material);
+    scene.add(particles);
 
-    canvas.width = 700;
-    canvas.height = 700;
+    console.log("Particles added to scene");
 
-    const size = 350;
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-
-    // 初始化粒子系统
-    initParticles(centerX, centerY, size);
-
-    // 粒子动画渲染（移除心跳效果）
+    // 动画循环
     const animate = () => {
-        // 绘制粒子系统
-        draw();
-
         animationId = requestAnimationFrame(animate);
+
+        // 更新时间
+        const time = Date.now() * 0.001;
+
+        // 轻微跳动效果（缩放）
+        const scale = 1 + Math.sin(time * 2) * 0.05; // 轻微跳动，幅度5%
+        particles.scale.set(scale, scale, scale);
+
+        // 相机保持静止，只看向中心
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
     };
+
     animate();
+
+    // 处理窗口大小变化
+    const handleResize = () => {
+        if (!containerRef.value) return;
+        const rect = containerRef.value.getBoundingClientRect();
+        const width = rect.width || 800;
+        const height = rect.height || 800;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // 清理函数
+    return () => {
+        window.removeEventListener("resize", handleResize);
+    };
 };
 
 onMounted(() => {
-    initCanvas();
+    // 等待 DOM 完全渲染后再初始化
+    nextTick(() => {
+        window.setTimeout(() => {
+            const cleanup = initThree();
+
+            // 保存清理函数
+            if (cleanup) {
+                onUnmounted(() => {
+                    cleanup();
+                });
+            }
+        }, 100); // 额外延迟确保容器已渲染
+    });
 });
 
 onUnmounted(() => {
     if (animationId) {
         cancelAnimationFrame(animationId);
+    }
+
+    if (renderer) {
+        renderer.dispose();
+    }
+
+    if (particles) {
+        particles.geometry.dispose();
+        particles.material.dispose();
+    }
+
+    if (containerRef.value && renderer && renderer.domElement) {
+        try {
+            containerRef.value.removeChild(renderer.domElement);
+        } catch (e) {
+            console.warn("Error removing renderer:", e);
+        }
     }
 });
 </script>
@@ -246,7 +326,7 @@ onUnmounted(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     position: relative;
 }
 
@@ -258,13 +338,14 @@ onUnmounted(() => {
     left: 0;
     pointer-events: none;
     overflow: hidden;
+    z-index: 1;
 }
 
 .floating-heart {
     position: absolute;
     font-size: 20px;
     animation: float 15s infinite linear;
-    opacity: 0.6;
+    opacity: 0.4;
 }
 
 .floating-heart:nth-child(odd) {
@@ -283,10 +364,10 @@ onUnmounted(() => {
         opacity: 0;
     }
     10% {
-        opacity: 0.6;
+        opacity: 0.4;
     }
     90% {
-        opacity: 0.6;
+        opacity: 0.4;
     }
     100% {
         transform: translateY(-100px) rotate(360deg);
@@ -296,13 +377,10 @@ onUnmounted(() => {
 
 .heart-container {
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    width: 800px;
+    height: 800px;
     animation: heartBeat 2.5s ease-in-out infinite;
-}
-
-.heart-canvas {
-    display: block;
-    filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.5));
 }
 
 @keyframes heartBeat {
@@ -330,7 +408,8 @@ onUnmounted(() => {
     color: #fff;
     text-shadow: 2px 2px 10px rgba(255, 20, 147, 0.8), 0 0 20px rgba(255, 105, 180, 0.6);
     animation: textGlow 2s ease-in-out infinite alternate, textBounce 2s ease-in-out infinite;
-    z-index: 1;
+    z-index: 3;
+    position: relative;
 }
 
 @keyframes textGlow {
