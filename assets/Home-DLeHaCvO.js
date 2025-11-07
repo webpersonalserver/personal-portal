@@ -1,0 +1,1 @@
+import{_ as e,c as o,o as a}from"./index-BbTcNvIp.js";const c={},t={class:"portal-pages-home-container"};function s(n,r){return a(),o("div",t,"Home Page")}const d=e(c,[["render",s],["__scopeId","data-v-405ad6a7"]]);export{d as default};
