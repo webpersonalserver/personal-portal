@@ -11,7 +11,8 @@ const routes = [
         path: "/heart",
         name: "Heart",
         meta: {
-            title: "Heart"
+            title: "Heart",
+            hideHeader: true
         },
         component: () => import("../pages/Heart.vue")
     },

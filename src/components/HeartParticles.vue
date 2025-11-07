@@ -66,7 +66,7 @@ function calculateScale() {
     // 计算缩放比例：使爱心刚好占满屏幕宽度的99%，不超过容器宽度
     baseScale = (visibleWidth * targetRatio) / heartWidth;
     // 增加额外的缩放倍数，让爱心更大
-    baseScale = baseScale * 1.8;
+    baseScale = baseScale * 1.65;
     return baseScale;
 }
 
@@ -732,15 +732,14 @@ function animate() {
 }
 
 .romantic-text {
-    font-size: 32px;
+    width: 100%;
+    font-size: 28px;
     font-weight: bold;
     color: #fff;
     text-shadow: 2px 2px 10px rgba(255, 20, 147, 0.8), 0 0 20px rgba(255, 105, 180, 0.6);
-    animation: textGlow 2s ease-in-out infinite alternate, textBounce 2s ease-in-out infinite;
     z-index: 3;
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
     bottom: 30px;
     text-align: center;
 }
