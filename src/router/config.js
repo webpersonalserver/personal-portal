@@ -11,18 +11,17 @@ const routes = [
         path: "/heart",
         name: "Heart",
         meta: {
-            title: "Heart",
-            hideHeader: false
+            title: "Heart"
         },
         component: () => import("../pages/Heart.vue")
     },
     {
-        path: "/experiment",
-        name: "Experiment",
+        path: "/mcp",
+        name: "MCP",
         meta: {
-            title: "Experiment"
+            title: "MCP"
         },
-        component: () => import("../pages/Experiment.vue")
+        component: () => import("../pages/MCP.vue")
     }
 ];
 

@@ -32,9 +32,9 @@ const menus = computed(() => [
         path: "/heart"
     },
     {
-        key: "Experiment",
-        label: "Experiment",
-        path: "/experiment"
+        key: "MCP",
+        label: "MCP",
+        path: "/mcp"
     }
 ]);
 
