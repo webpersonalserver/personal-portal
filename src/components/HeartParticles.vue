@@ -66,7 +66,7 @@ function calculateScale() {
     // 计算缩放比例：使爱心刚好占满屏幕宽度的99%，不超过容器宽度
     baseScale = (visibleWidth * targetRatio) / heartWidth;
     // 增加额外的缩放倍数，让爱心更大
-    baseScale = baseScale * 1.65;
+    baseScale = baseScale * 1.3;
     return baseScale;
 }
 
@@ -733,7 +733,7 @@ function animate() {
 
 .romantic-text {
     width: 100%;
-    font-size: 28px;
+    font-size: 16px;
     font-weight: bold;
     color: #fff;
     text-shadow: 2px 2px 10px rgba(255, 20, 147, 0.8), 0 0 20px rgba(255, 105, 180, 0.6);

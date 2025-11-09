@@ -12,7 +12,7 @@ const routes = [
         name: "Heart",
         meta: {
             title: "Heart",
-            hideHeader: true
+            hideHeader: false
         },
         component: () => import("../pages/Heart.vue")
     },
