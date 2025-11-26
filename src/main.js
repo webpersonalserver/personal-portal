@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import "./style.css";
+import "./css/animation.less";
 import App from "./App.vue";
 import router from "./router";
 // Arco Design 样式（按需引入时仍需要引入样式）

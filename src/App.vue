@@ -3,7 +3,14 @@
         <Header v-show="showHeader" />
 
         <div class="personal-portal-body-container">
-            <router-view />
+            <router-view v-slot="{ Component, route: routeSlot }">
+                <transition
+                    :name="getTransitionName(routeSlot)"
+                    mode="out-in"
+                >
+                    <component :is="Component" :key="routeSlot.path" />
+                </transition>
+            </router-view>
         </div>
 
         <Footer v-if="showFooter" />
@@ -28,6 +35,11 @@ const showFooter = computed(() => {
     return !!route.meta.displayFooter;
 });
 
+function getTransitionName(route) {
+    const { transition = "slide-fade" } = route.meta;
+
+    return transition;
+}
 
 </script>
 
@@ -45,9 +57,10 @@ const showFooter = computed(() => {
 
   .personal-portal-body-container {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     box-sizing: border-box;
     background-color: #fff;
+    position: relative;
   }
 }
 </style>
