@@ -1,0 +1,21 @@
+{
+  "name": "personal-portal-backend",
+  "version": "1.0.0",
+  "description": "Personal portal backend with Koa and MySQL",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "koa": "^2.15.0",
+    "koa-router": "^12.0.1",
+    "koa-bodyparser": "^4.4.1",
+    "@koa/cors": "^5.0.0",
+    "mysql2": "^3.9.1",
+    "dotenv": "^16.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

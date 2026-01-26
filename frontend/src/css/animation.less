@@ -1,0 +1,553 @@
+// 通用动画基础样式
+@animation-duration: 0.6s;
+@animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+// 动画容器通用样式
+.animation-base() {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: all @animation-duration @animation-easing;
+}
+
+// 1. 淡入淡出动画
+.fade-enter-active,
+.fade-leave-active {
+  .animation-base();
+}
+
+.fade-enter-from {
+  opacity: 0;
+}
+
+.fade-enter-to {
+  opacity: 1;
+}
+
+.fade-leave-from {
+  opacity: 1;
+}
+
+.fade-leave-to {
+  opacity: 0;
+}
+
+// 2. 垂直滑动效果 - 从上往下
+.slide-down-enter-active,
+.slide-down-leave-active {
+  .animation-base();
+}
+
+.slide-down-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.slide-down-enter-to {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-down-leave-from {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-down-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+// 3. 水平滑动效果 - 从左往右
+.slide-right-enter-active,
+.slide-right-leave-active {
+  .animation-base();
+}
+
+.slide-right-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-right-enter-to {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-right-leave-from {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-right-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+// 4. 水平滑动效果 - 从右往左
+.slide-left-enter-active,
+.slide-left-leave-active {
+  .animation-base();
+}
+
+.slide-left-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-left-enter-to {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-left-leave-from {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-left-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+// 5. 垂直滑动效果 - 从下往上
+.slide-up-enter-active,
+.slide-up-leave-active {
+  .animation-base();
+}
+
+.slide-up-enter-from {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.slide-up-enter-to {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-up-leave-from {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-up-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+// 6. 缩放进入动画 - 放大进入
+.zoom-in-enter-active,
+.zoom-in-leave-active {
+  .animation-base();
+}
+
+.zoom-in-enter-from {
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+.zoom-in-enter-to {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zoom-in-leave-from {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zoom-in-leave-to {
+  transform: scale(1.2);
+  opacity: 0;
+}
+
+// 7. 缩放退出动画 - 缩小退出
+.zoom-out-enter-active,
+.zoom-out-leave-active {
+  .animation-base();
+}
+
+.zoom-out-enter-from {
+  transform: scale(1.2);
+  opacity: 0;
+}
+
+.zoom-out-enter-to {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zoom-out-leave-from {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zoom-out-leave-to {
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+// 8. 缩放淡入淡出动画
+.zoom-fade-enter-active,
+.zoom-fade-leave-active {
+  .animation-base();
+}
+
+.zoom-fade-enter-from {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.zoom-fade-enter-to {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zoom-fade-leave-from {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zoom-fade-leave-to {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+// 9. 旋转进入动画
+.rotate-enter-active,
+.rotate-leave-active {
+  .animation-base();
+}
+
+.rotate-enter-from {
+  transform: rotate(-180deg) scale(0.8);
+  opacity: 0;
+}
+
+.rotate-enter-to {
+  transform: rotate(0deg) scale(1);
+  opacity: 1;
+}
+
+.rotate-leave-from {
+  transform: rotate(0deg) scale(1);
+  opacity: 1;
+}
+
+.rotate-leave-to {
+  transform: rotate(180deg) scale(0.8);
+  opacity: 0;
+}
+
+// 10. 水平翻转动画
+.flip-x-enter-active,
+.flip-x-leave-active {
+  .animation-base();
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.flip-x-enter-from {
+  transform: rotateY(-90deg);
+  opacity: 0;
+}
+
+.flip-x-enter-to {
+  transform: rotateY(0deg);
+  opacity: 1;
+}
+
+.flip-x-leave-from {
+  transform: rotateY(0deg);
+  opacity: 1;
+}
+
+.flip-x-leave-to {
+  transform: rotateY(90deg);
+  opacity: 0;
+}
+
+// 11. 垂直翻转动画
+.flip-y-enter-active,
+.flip-y-leave-active {
+  .animation-base();
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.flip-y-enter-from {
+  transform: rotateX(-90deg);
+  opacity: 0;
+}
+
+.flip-y-enter-to {
+  transform: rotateX(0deg);
+  opacity: 1;
+}
+
+.flip-y-leave-from {
+  transform: rotateX(0deg);
+  opacity: 1;
+}
+
+.flip-y-leave-to {
+  transform: rotateX(90deg);
+  opacity: 0;
+}
+
+// 12. 滑动淡入淡出动画（更柔和）
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  .animation-base();
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.slide-fade-enter-from {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.slide-fade-enter-to {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-fade-leave-from {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-fade-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+// 13. 缩放滑动动画
+.zoom-slide-enter-active,
+.zoom-slide-leave-active {
+  .animation-base();
+}
+
+.zoom-slide-enter-from {
+  transform: scale(0.9) translateY(30px);
+  opacity: 0;
+}
+
+.zoom-slide-enter-to {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.zoom-slide-leave-from {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.zoom-slide-leave-to {
+  transform: scale(0.9) translateY(-30px);
+  opacity: 0;
+}
+
+// 14. 立方体翻转动画（3D效果）
+.cube-enter-active,
+.cube-leave-active {
+  .animation-base();
+  transform-style: preserve-3d;
+  perspective: 1200px;
+}
+
+.cube-enter-from {
+  transform: rotateY(90deg);
+  opacity: 0;
+}
+
+.cube-enter-to {
+  transform: rotateY(0deg);
+  opacity: 1;
+}
+
+.cube-leave-from {
+  transform: rotateY(0deg);
+  opacity: 1;
+}
+
+.cube-leave-to {
+  transform: rotateY(-90deg);
+  opacity: 0;
+}
+
+// 15. 卡片翻转动画
+.card-flip-enter-active,
+.card-flip-leave-active {
+  .animation-base();
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-flip-enter-from {
+  transform: rotateY(180deg) scale(0.9);
+  opacity: 0;
+}
+
+.card-flip-enter-to {
+  transform: rotateY(0deg) scale(1);
+  opacity: 1;
+}
+
+.card-flip-leave-from {
+  transform: rotateY(0deg) scale(1);
+  opacity: 1;
+}
+
+.card-flip-leave-to {
+  transform: rotateY(-180deg) scale(0.9);
+  opacity: 0;
+}
+
+// 16. 弹性动画
+.bounce-enter-active {
+  .animation-base();
+  animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.bounce-leave-active {
+  .animation-base();
+  animation: bounce-out 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.bounce-enter-from {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.bounce-enter-to {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.bounce-leave-from {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.bounce-leave-to {
+  transform: scale(0);
+  opacity: 0;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+// 17. 弹性滑动动画
+.elastic-enter-active {
+  .animation-base();
+  animation: elastic-in 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.elastic-leave-active {
+  .animation-base();
+  animation: elastic-out 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.elastic-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.elastic-enter-to {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.elastic-leave-from {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.elastic-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+@keyframes elastic-in {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(10%);
+  }
+  80% {
+    transform: translateX(-5%);
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes elastic-out {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+// 18. 缩放淡入淡出（轻微缩放）
+.scale-fade-enter-active,
+.scale-fade-leave-active {
+  .animation-base();
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.scale-fade-enter-from {
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+.scale-fade-enter-to {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.scale-fade-leave-from {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.scale-fade-leave-to {
+  transform: scale(0.95);
+  opacity: 0;
+}
