@@ -1,5 +1,5 @@
 <template>
-    <div class="personal-portal-website-container">
+    <div v-loading="portalLoading" class="personal-portal-website-container">
         <Header v-show="showHeader" />
 
         <div class="personal-portal-body-container">
@@ -22,6 +22,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
+import { portalLoading } from "@/hooks/useGlobalHook.js";
 
 // 获取当前路由信息（route 对象本身是响应式的）
 // 可以直接在模板中使用 route.path、route.name 等，会自动更新

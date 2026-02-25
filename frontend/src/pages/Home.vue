@@ -2,7 +2,8 @@
     <div class="portal-pages-home-container">Home Page</div>
 </template>
 
-<script setup></script>
+<script setup>
+</script>
 
 <style lang="less" scoped>
 .portal-pages-home-container {
